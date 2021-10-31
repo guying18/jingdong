@@ -1,26 +1,29 @@
 <template>
   <div class="mask"
-       v-if="showCart"></div>
+       v-if="showCart && calculations.total > 0"
+       @click="handleCartShowChange"></div>
   <div class="cart">
     <div class="product"
-         v-if="showCart">
+         v-if="showCart && calculations.total > 0">
       <div class="product__header">
         <div class="product__header__all"
-             @click="() => setCartItemsChecked(shopId,allChecked)">
+             @click="() => setCartItemsChecked(shopId,calculations.allChecked)">
           <span class="product__header__icon iconfont"
-                v-html="allChecked? '&#xe656;' :'&#xe64f;'">
+                v-html="calculations.allChecked? '&#xe656;' :'&#xe7ae;'">
           </span>
           全选
         </div>
-        <div class="product__header__clear"
-             @click="() => cleanCartProducts(shopId)">清空购物车</div>
+        <div class="product__header__clear">
+          <span class="product__header__clear_btn"
+                @click="() => cleanCartProducts(shopId)">清空购物车</span>
+        </div>
       </div>
       <template v-for="item in productList"
                 :key="item._id">
         <div class="product__item"
              v-if="item.count > 0">
           <div class="product__item__checked iconfont"
-               v-html="item.check? '&#xe656;' :'&#xe64f;'"
+               v-html="item.check? '&#xe656;' :'&#xe7ae;'"
                @click="() => changeCartItemChecked(shopId, item._id)"></div>
           <img :src="item.imgUrl"
                alt=""
@@ -35,7 +38,7 @@
           <div class="product__number">
             <span class="product__number__minus"
                   @click="() => { changeCartItemInfo(shopId, item._id, item, -1)}">-</span>
-            {{cartList?.[shopId]?.[item._id].count || 0}}
+            {{getProductCartCount(shopId,item._id)}}
             <span class="product__number__plus"
                   @click="() => { changeCartItemInfo(shopId, item._id, item, 1)}">+</span>
           </div>
@@ -48,12 +51,14 @@
              alt=""
              class="check__icon__img"
              @click="handleCartShowChange">
-        <div class="check__icon__tag">{{total}}</div>
+        <div class="check__icon__tag">{{calculations.total}}</div>
       </div>
       <div class="check__info">
-        总计：<span class="check__info__price">&yen; {{price}}</span>
+        总计：<span class="check__info__price">&yen; {{calculations.price}}</span>
       </div>
-      <div class="check__btn">去结算</div>
+      <div class="check__btn">
+        <router-link :to="{name: 'Home'}">去结算</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -66,49 +71,31 @@ import { useCommonCartEffect } from '@/views/shop/commonCartEffect.js'
 
 // 底部购物车相关逻辑
 const useCartEffect = () => {
-  const { cartList, changeCartItemInfo } = useCommonCartEffect()
+  const { cartList, changeCartItemInfo, getProductCartCount } = useCommonCartEffect()
   const store = useStore()
   const route = useRoute()
   const shopId = route.params.id
-  const total = computed(() => {
-    const productList = cartList[shopId]
-    let count = 0
+
+  const calculations = computed(() => {
+    const productList = cartList[shopId]?.productList
+    const result = { total: 0, price: 0, allChecked: true }
     if (productList) {
       for (const i in productList) {
         const product = productList[i]
-        count += product.count
-      }
-    }
-    return count
-  })
-  const price = computed(() => {
-    const productList = cartList[shopId]
-    let count = 0
-    if (productList) {
-      for (const i in productList) {
-        const product = productList[i]
+        result.total += product.count
         if (product.check) {
-          count += (product.count * product.price)
+          result.price += (product.count * product.price)
         }
-      }
-    }
-    return count.toFixed(2)
-  })
-  const allChecked = computed(() => {
-    const productList = cartList[shopId]
-    let result = true
-    if (productList) {
-      for (const i in productList) {
-        const product = productList[i]
         if (product.count > 0 && !product.check) {
-          result = false
+          result.allChecked = false
         }
       }
     }
+    result.price = result.price.toFixed(2)
     return result
   })
   const productList = computed(() => {
-    const productList = cartList[shopId] || []
+    const productList = cartList[shopId]?.productList || []
     return productList
   })
   const changeCartItemChecked = (shopId, productId) => {
@@ -121,43 +108,47 @@ const useCartEffect = () => {
     store.commit('setCartItemsChecked', { shopId, allChecked })
   }
   return {
-    allChecked,
+    calculations,
     cartList,
-    total,
-    price,
     shopId,
     productList,
     changeCartItemInfo,
     cleanCartProducts,
     changeCartItemChecked,
-    setCartItemsChecked
+    setCartItemsChecked,
+    getProductCartCount
   }
+}
+
+// 展示隐藏购物车逻辑
+const toggleCartEffect = () => {
+  const showCart = ref(false)
+  const handleCartShowChange = () => {
+    showCart.value = !showCart.value
+  }
+  return { showCart, handleCartShowChange }
 }
 
 export default {
   name: 'Cart',
   setup () {
-    const showCart = ref(false)
-    const handleCartShowChange = () => {
-      showCart.value = !showCart.value
-    }
+    const { showCart, handleCartShowChange } = toggleCartEffect()
     const {
-      total, price, shopId, productList, cartList, allChecked,
+      calculations, shopId, productList, cartList, getProductCartCount,
       cleanCartProducts, changeCartItemInfo, changeCartItemChecked, setCartItemsChecked
     } = useCartEffect()
     return {
       showCart,
       handleCartShowChange,
       cartList,
-      total,
-      price,
       productList,
       shopId,
-      allChecked,
+      calculations,
       cleanCartProducts,
       changeCartItemInfo,
       changeCartItemChecked,
-      setCartItemsChecked
+      setCartItemsChecked,
+      getProductCartCount
     }
   }
 }
@@ -198,6 +189,8 @@ export default {
     }
     &__icon {
       display: inline-block;
+      vertical-align: top;
+      margin-right: 0.08rem;
       width: 0.19rem;
       height: 0.19rem;
       color: $btn-bgColor;
@@ -208,6 +201,9 @@ export default {
       margin-right: 0.18rem;
       text-align: right;
       color: $content-fontcolor;
+      &_btn {
+        display: inline-block;
+      }
     }
   }
   &__item {
@@ -257,7 +253,7 @@ export default {
     .product__number {
       position: absolute;
       right: 0;
-      bottom: 0.12rem;
+      bottom: 0.26rem;
       &__minus,
       &__plus {
         display: inline-block;
@@ -331,8 +327,11 @@ export default {
     width: 0.98rem;
     background-color: #4fb0f9;
     text-align: center;
-    color: $bg-color;
     font-size: 0.14rem;
+    a {
+      text-decoration: none;
+      color: $bg-color;
+    }
   }
 }
 </style>
