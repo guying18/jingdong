@@ -1,14 +1,15 @@
 <template>
-    <div class="docker">
-        <div
-            v-for="(item, index) in dockerList"
-            :key="item.text"
-            :class="{'docker__item': true, 'docker__item--active': index === 0}"
-        >
-            <div class="iconfont" v-html="item.icon"></div>
-            <div class="docker__title">{{item.text}}</div>
-        </div>
+  <div class="docker">
+    <div v-for="(item, index) in dockerList"
+         :key="item.text"
+         :class="{'docker__item': true, 'docker__item--active': index === 0}">
+      <router-link :to="item.to">
+        <div class="iconfont"
+             v-html="item.icon"></div>
+        <div class="docker__title">{{item.text}}</div>
+      </router-link>
     </div>
+  </div>
 </template>
 
 <script>
@@ -16,10 +17,10 @@ export default {
   name: 'Docker',
   setup () {
     const dockerList = [
-      { icon: '&#xe7d8;', text: '首页' },
-      { icon: '&#xe6bc;', text: '购物车' },
-      { icon: '&#xe63e;', text: '订单' },
-      { icon: '&#xe660;', text: '我的' }
+      { icon: '&#xe7d8;', text: '首页', to: { name: 'Home' } },
+      { icon: '&#xe6bc;', text: '购物车', to: { name: 'CartList' } },
+      { icon: '&#xe63e;', text: '订单', to: { name: 'Home' } },
+      { icon: '&#xe660;', text: '我的', to: { name: 'Home' } }
     ]
     return { dockerList }
   }
@@ -27,31 +28,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/style/variables.scss';
+@import "@/style/variables.scss";
 .docker {
   display: flex;
   box-sizing: border-box;
   position: absolute;
-  padding: 0, .18rem;
+  padding: 0, 0.18rem;
   left: 0;
   bottom: 0;
   width: 100%;
   height: 0.49rem;
-  border-top: .01rem solid $content-bgcolor;
+  border-top: 0.01rem solid $content-bgcolor;
   color: $content-fontcolor;
-  &__item{
+  &__item {
     flex: 1;
     text-align: center;
+    a {
+      color: $content-fontcolor;
+      text-decoration: none;
+    }
     .iconfont {
-      margin: .07rem 0 .02rem 0;
-      font-size: .2rem;
+      margin: 0.07rem 0 0.02rem 0;
+      font-size: 0.2rem;
     }
     &--active {
-      color: #1FA4FC ;
+      a {
+        color: #1fa4fc;
+      }
     }
   }
-  &__title{
-    font-size: .2rem;
+  &__title {
+    font-size: 0.2rem;
     transform: scale(0.5, 0.5);
     transform-origin: center top;
   }

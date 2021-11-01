@@ -23,8 +23,8 @@
         </div>
         <div class="product__number">
           <span class="product__number__minus"
-                @click="() => { changeCartItem(shopId, item._id, item, -1,shopName)}">-</span>
-          {{getProductCartCount(shopId,item._id)}}
+                @click="() => { changeCartItem(shopId, item._id, item, -1, shopName)}">-</span>
+          {{getProductCartCount(shopId, item._id)}}
           <span class="product__number__plus"
                 @click="() => { changeCartItem(shopId, item._id, item, 1, shopName)}">+</span>
         </div>
@@ -38,7 +38,7 @@ import { ref, reactive, toRefs, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { get } from '@/utils/request.js'
-import { useCommonCartEffect } from '@/views/shop/commonCartEffect.js'
+import { useCommonCartEffect } from '@/effects/CartEffects.js'
 
 const categories = [
   { name: '全部商品', tab: 'all' },
