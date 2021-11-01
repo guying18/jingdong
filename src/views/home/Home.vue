@@ -1,15 +1,15 @@
 <template>
   <div class="wrapper">
-      <StaticPart />
-      <Nearby />
+    <StaticPart />
+    <Nearby />
   </div>
-  <Docker />
+  <Docker :currentIndex="0" />
 </template>
 
 <script>
-import StaticPart from './StaticPart.vue'
-import Nearby from './Nearby.vue'
-import Docker from './Docker.vue'
+import StaticPart from '@/views/home/StaticPart.vue'
+import Nearby from '@/views/home/Nearby.vue'
+import Docker from '@/components/Docker.vue'
 
 export default {
   name: 'Home',
@@ -22,15 +22,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/style/variables.scss';
-@import '@/style/mixins.scss';
-.wrapper{
+.wrapper {
   overflow-y: auto;
   position: absolute;
   left: 0;
   top: 0;
-  bottom: .5rem;
+  bottom: 0.5rem;
   right: 0;
-  padding: 0 .18rem .2rem .18rem;
+  padding: 0 0.18rem 0.2rem 0.18rem;
 }
 </style>

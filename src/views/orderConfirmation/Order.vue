@@ -32,6 +32,48 @@ import { post } from '@/utils/request.js'
 import { useCommonCartEffect } from '@/effects/CartEffects.js'
 import Toast, { useToastEffect } from '@/components/Toast.vue'
 
+// 下单相关逻辑
+const useMakeOrderEffect = (shopId, shopName, productList) => {
+  const router = useRouter()
+  const store = useStore()
+  const { show, toastMessage, showToast } = useToastEffect()
+  const handleConfirmOrder = async (isCanceled) => {
+    const products = []
+    for (const i in productList.value) {
+      const product = productList.value[i]
+      products.push({ id: parseInt(product._id, 10), num: product.count })
+    }
+    try {
+      const result = await post('/api/order', {
+        adderssId: 1,
+        shopId,
+        shopName: shopName.value,
+        isCanceled,
+        products
+      })
+      console.log(result)
+      if (result.errno === 0) {
+        store.commit('clearCartData', { shopId })
+        router.push({ name: 'OrderList' })
+      } else {
+        showToast('获取失败')
+      }
+    } catch (e) {
+      showToast('请求失败')
+    }
+  }
+  return { show, toastMessage, handleConfirmOrder }
+}
+
+// 蒙层展示相关逻辑
+const useShowMaskEffect = () => {
+  const showConfirm = ref(false)
+  const handleSubmitClick = (state) => {
+    showConfirm.value = state
+  }
+  return { showConfirm, handleSubmitClick }
+}
+
 export default {
   name: 'Order',
   components: {
@@ -39,41 +81,12 @@ export default {
   },
   setup () {
     const route = useRoute()
-    const router = useRouter()
-    const store = useStore()
     const shopId = parseInt(route.params.id, 10)
-    const showConfirm = ref(false)
-    const { shopName, productList, calculations } = useCommonCartEffect(shopId)
-    const { show, toastMessage, showToast } = useToastEffect()
-    const handleSubmitClick = (state) => {
-      showConfirm.value = state
-    }
 
-    const handleConfirmOrder = async (isCanceled) => {
-      const products = []
-      for (const i in productList.value) {
-        const product = productList.value[i]
-        products.push({ id: parseInt(product._id, 10), num: product.count })
-      }
-      try {
-        const result = await post('/api/order', {
-          adderssId: 1,
-          shopId,
-          shopName: shopName.value,
-          isCanceled,
-          products
-        })
-        console.log(result)
-        if (result.errno === 0) {
-          store.commit('clearCartData', { shopId })
-          router.push({ name: 'Home' })
-        } else {
-          showToast('获取失败')
-        }
-      } catch (e) {
-        showToast('请求失败')
-      }
-    }
+    const { shopName, productList, calculations } = useCommonCartEffect(shopId)
+    const { show, toastMessage, handleConfirmOrder } = useMakeOrderEffect(shopId, shopName, productList)
+    const { showConfirm, handleSubmitClick } = useShowMaskEffect()
+
     return { showConfirm, calculations, handleConfirmOrder, handleSubmitClick, show, toastMessage }
   }
 }

@@ -14,6 +14,7 @@
 import { ref } from 'vue'
 import { get } from '@/utils/request.js'
 import ShopInfo from '@/components/ShopInfo.vue'
+
 // 获取 NearbyList 数据
 const useNearbyListEffect = () => {
   const nearbyList = ref([])
