@@ -112,13 +112,14 @@ export default {
     margin: 0 0.4rem 0.16rem 0.4rem;
     padding: 0 0.16rem;
     background: #f9f9f9;
-    border: 1px solid rgba($color: #000, $alpha: 0.1);
-    border-radius: 6px;
+    border: 0.01rem solid rgba($color: #000, $alpha: 0.1);
+    border-radius: 0.06rem;
     &__content {
+      margin-top: 0.12rem;
       border: none;
       outline: none;
       background: none;
-      line-height: 0.48rem;
+      line-height: 0.22rem;
       width: 100%;
       font-size: 0.16rem;
       color: $content-notice-fontcolor;

@@ -22,10 +22,12 @@ export const useCommonCartEffect = (shopId) => {
     }
     return notEmptyProductList
   })
+
   const shopName = computed(() => {
     const shopName = cartList[shopId]?.shopName || ''
     return shopName
   })
+
   const calculations = computed(() => {
     const productList = cartList[shopId]?.productList
     const result = { total: 0, totalPrice: 0, allChecked: true }
