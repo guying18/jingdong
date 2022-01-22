@@ -37,9 +37,9 @@ const useLoginEffect = (showToast) => {
     password: ''
   })
   const handleLogin = async () => {
-    try {
-      const { username, password } = data
-      if (username !== '' & password !== '') {
+    const { username, password } = data
+    if (username !== '' && password !== '') {
+      try {
         const result = await post('/api/user/login', {
           username: username,
           password: password
@@ -51,11 +51,11 @@ const useLoginEffect = (showToast) => {
         } else {
           showToast('登录失败')
         }
-      } else {
-        showToast('用户名和密码不能为空')
+      } catch (e) {
+        showToast('请求失败')
       }
-    } catch (e) {
-      showToast('请求失败')
+    } else {
+      showToast('用户名和密码不能为空')
     }
   }
   const { username, password } = toRefs(data)

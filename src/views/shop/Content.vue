@@ -59,7 +59,7 @@ const useCurrentListEffect = (currentTab, shopId) => {
   const content = reactive({ list: [] })
   const getContentData = async () => {
     const result = await get(`/api/shop/${shopId}/products`, { tab: currentTab.value })
-    if (result.errno === 0 && result.data.length) {
+    if (result?.errno === 0 && result?.data?.length) {
       content.list = result.data
     }
   }

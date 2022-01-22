@@ -10,6 +10,7 @@
                placeholder="请输入商品名称搜索">
       </div>
     </div>
+    <!--  v-if="item.imgUrl" 优化手段: 保证请求到数据后再展示 ShopInfo 组件 -->
     <ShopInfo :item="item"
               :hideBorder='true'
               v-if="item.imgUrl" />
@@ -34,7 +35,7 @@ const useShopInfoEffect = () => {
   })
   const getItemData = async () => {
     const result = await get(`/api/shop/${route.params.id}`)
-    if (result.errno === 0 && result.data) {
+    if (result?.errno === 0 && result?.data) {
       data.item = result.data
     }
   }

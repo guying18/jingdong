@@ -5,18 +5,21 @@
     <div class="wrapper__input">
       <input type="text"
              class="wrapper__input__content"
-             placeholder="请输入用户名" />
+             placeholder="请输入用户名"
+             v-model="username" />
     </div>
     <div class="wrapper__input">
       <input type="password"
              class="wrapper__input__content"
              autocomplete="new-password"
-             placeholder="请输入密码" />
+             placeholder="请输入密码"
+             v-model="password" />
     </div>
     <div class="wrapper__input">
       <input type="password"
              class="wrapper__input__content"
-             placeholder="确认密码" />
+             placeholder="确认密码"
+             v-model="ensurment" />
     </div>
     <div class="wrapper__register-button"
          @click="handleRegister">注册</div>
@@ -43,19 +46,29 @@ const useRegisterEffect = (showToast) => {
     ensurment: ''
   })
   const handleRegister = async () => {
-    try {
-      const result = await post('/api/user/register', {
-        username: data.username,
-        password: data.password
-      })
-      // console.log(result)
-      if (result.errno === 0) {
-        router.push({ name: 'Login' })
+    const { username, password, ensurment } = data
+    if (username !== '' && password !== '') {
+      if (ensurment === password) {
+        try {
+          const result = await post('/api/user/register', {
+            username: data.username,
+            password: data.password,
+            ensurment: data.ensurment
+          })
+          // console.log(result)
+          if (result.errno === 0) {
+            router.push({ name: 'Login' })
+          } else {
+            showToast('注册失败')
+          }
+        } catch (e) {
+          showToast('请求失败')
+        }
       } else {
-        showToast('注册失败')
+        showToast('密码不一致')
       }
-    } catch (e) {
-      showToast('请求失败')
+    } else {
+      showToast('用户名和密码不能为空')
     }
   }
   const { username, password, ensurment } = toRefs(data)
